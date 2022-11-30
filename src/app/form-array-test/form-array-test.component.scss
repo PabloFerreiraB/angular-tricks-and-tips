@@ -20,7 +20,7 @@
     }
   }
 
-  .mat-accordion>.mat-expansion-panel-spacing {
+  .mat-accordion > .mat-expansion-panel-spacing {
     margin: 20px 0;
   }
 
@@ -35,7 +35,13 @@
 
   .dflex {
     display: flex;
+    justify-content: center;
     gap: 8px;
+  }
+
+  .days {
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .width-100 {
@@ -48,5 +54,77 @@
 
   .mat-form-field-appearance-outline .mat-form-field-wrapper {
     margin: 0.25em 8px !important;
+  }
+
+  .container-period {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+
+    .day-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      .icon {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        border: none;
+        cursor: pointer;
+      }
+    }
+
+    .button-period {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      align-items: center;
+      width: 40px;
+      text-align: center;
+      background-color: #1976d2;
+      color: #fff;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .isSelected {
+      border: 2px solid #424242;
+    }
+
+    .styleIconOne {
+      color: #9d9d9d;
+    }
+
+    .styleIconTwo {
+      color: #1976d2;
+    }
+
+    .styleOne {
+      background-color: #9d9d9d;
+    }
+
+    .styleTwo {
+      background-color: #1976d2;
+    }
+
+    .styleDisableDayIcon {
+      color: #9d9d9d;
+    }
+
+    .styleDisableDay {
+      color: #fff;
+      background-color: #9d9d9d;
+    }
+  }
+
+  .container-hours {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
   }
 }

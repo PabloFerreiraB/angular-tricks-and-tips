@@ -49,12 +49,11 @@
                       <mat-label>Canais de venda</mat-label>
                       <mat-select
                         class="form-control"
-                        multiple
                         formControlName="salesChannelId">
                         <mat-option
                           *ngFor="let s of listSalesChannel"
                           [value]="s.salesChannelId"
-                          (onSelectionChange)="selectedChannels($event, i)">
+                          (onSelectionChange)="selectedChannels($event)">
                           {{ s.salesChannelName }}
                         </mat-option>
                       </mat-select>
@@ -90,21 +89,75 @@
               </div>
 
               <!-- Dias da semana -->
-              <div class="dflex" formArrayName="openingHours">
+              <div class="dflex days" formArrayName="openingHours">
                 <ng-container
                   *ngFor="
                     let day of getOpeningHoursFormArray(control).controls;
                     let key = index
                   ">
                   <ng-container [formGroupName]="key">
-                    <mat-form-field appearance="outline" class="width-50">
-                      <mat-label>Código da Loja</mat-label>
-                      <input
-                        class="form-control"
-                        matInput
-                        placeholder="00-00"
-                        formControlName="initialTime" />
-                    </mat-form-field>
+                    <div class="container-period">
+                      <div
+                        class="day-wrapper"
+                        *ngFor="let item of periods; let i = index">
+                        <a>
+                          <mat-icon
+                            class="icon"
+                            [ngClass]="{
+                              isSelected: isSelected === i,
+                              styleIconOne:
+                                item.initialTime === '' && item.endTime === '',
+                              styleIconTwo:
+                                item.initialTime !== '' && item.endTime !== '',
+                              styleDisableDayIcon: disableDay
+                            }"
+                            >{{
+                              item.initialTime === '' && item.endTime === ''
+                                ? 'timer_off'
+                                : 'timer'
+                            }}
+                          </mat-icon>
+                        </a>
+
+                        <a
+                          class="button-period"
+                          [ngClass]="{
+                            isSelected: isSelected === i,
+                            styleOne:
+                              item.initialTime === '' && item.endTime === '',
+                            styleTwo:
+                              item.initialTime !== '' && item.endTime !== '',
+                            styleDisableDay: disableDay
+                          }"
+                          (click)="onClickPeriods(item, i)">
+                          {{ getDescription(item.dayWeek) }}
+                        </a>
+                      </div>
+                    </div>
+                    <!-- Periods Inputs -->
+                    <div class="container-hours">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Hora início</mat-label>
+                        <input
+                          id="initialTime"
+                          matInput
+                          type="time"
+                          [disabled]="!clickedDay"
+                          formControlName="initialTime"
+                          (change)="onChangeTime($event, 'initialTime')" />
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Hora fim</mat-label>
+                        <input
+                          id="endTime"
+                          matInput
+                          type="time"
+                          [disabled]="!clickedDay"
+                          formControlName="endTime"
+                          (change)="onChangeTime($event, 'endTime')" />
+                      </mat-form-field>
+                    </div>
                   </ng-container>
                 </ng-container>
               </div>

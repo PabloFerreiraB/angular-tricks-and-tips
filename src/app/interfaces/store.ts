@@ -58,6 +58,7 @@ export interface SalesChannel {
   storeModalitySalesChannelId: string;
   salesChannelId: string;
   salesChannelName: string;
+  token: string;
 }
 
 export interface StoreModality {

@@ -1,5 +1,5 @@
 import { ModalTokenComponent } from './../modal-token/modal-token.component';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -9,6 +9,22 @@ import {
 } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '../interfaces/store';
+
+export interface Periods {
+  dayWeek: number;
+  initialTime: string;
+  endTime: string;
+}
+
+export enum PeriodsEnum {
+  dom = 0,
+  seg = 1,
+  ter = 2,
+  qua = 3,
+  qui = 4,
+  sex = 5,
+  sab = 6,
+}
 
 @Component({
   selector: 'app-form-array-test',
@@ -22,6 +38,51 @@ export class FormArrayTestComponent implements OnInit {
   storeId!: '123123xxx-123123-xxxx';
   idRappi = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
   idIfood = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
+
+  periods: Periods[] = [
+    {
+      dayWeek: 0,
+      initialTime: '',
+      endTime: '',
+    },
+    {
+      dayWeek: 1,
+      initialTime: '',
+      endTime: '',
+    },
+    {
+      dayWeek: 2,
+      initialTime: '',
+      endTime: '',
+    },
+    {
+      dayWeek: 3,
+      initialTime: '',
+      endTime: '',
+    },
+    {
+      dayWeek: 4,
+      initialTime: '',
+      endTime: '',
+    },
+    {
+      dayWeek: 5,
+      initialTime: '',
+      endTime: '',
+    },
+    {
+      dayWeek: 6,
+      initialTime: '',
+      endTime: '',
+    },
+  ];
+  periodsSelecteds: Periods[] = [];
+  isSelected!: number;
+  indexPeriod?: number;
+  initialTime = '';
+  endTime = '';
+  disableDay = false;
+  clickedDay = false;
 
   listModality: any[] = [
     { id: '3fa85f64-5717-4562-b3fc-2c963f66afAA', name: 'Modalidade 1' },
@@ -103,8 +164,8 @@ export class FormArrayTestComponent implements OnInit {
               id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
               storeModalityId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
               dayWeek: 0,
-              initialTime: 'string',
-              endTime: 'string',
+              initialTime: '10:00',
+              endTime: '15:00',
             },
           ],
           salesChannel: [
@@ -113,6 +174,7 @@ export class FormArrayTestComponent implements OnInit {
                 '3fa85f64-5717-4562-b3fc-2c963f66afa6',
               salesChannelId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
               salesChannelName: 'string',
+              token: '',
             },
           ],
         },
@@ -120,10 +182,18 @@ export class FormArrayTestComponent implements OnInit {
     },
   ];
 
-  constructor(private formBuilder: FormBuilder, private matDialog: MatDialog) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private matDialog: MatDialog,
+    private renderer: Renderer2
+  ) {
     this.form = this.formBuilder.group({
       stores: this.formBuilder.array([]),
     });
+  }
+
+  get getMyFormArray(): FormArray {
+    return this.form.get('stores') as FormArray;
   }
 
   ngOnInit(): void {
@@ -133,13 +203,139 @@ export class FormArrayTestComponent implements OnInit {
       })
     );
 
-    this.form.patchValue(this.dataStores);
-
-    console.log('FORM', this.form.value);
+    this.patchValues(this.dataStores);
   }
 
-  get getMyFormArray(): FormArray {
-    return this.form.get('stores') as FormArray;
+  onClickPeriods(day: { initialTime: string; endTime: string }, index: number) {
+    this.isSelected = index;
+    this.indexPeriod = index;
+
+    const initialTime = day.initialTime.substring(0, 8);
+    const endTime = day.endTime.substring(0, 8);
+
+    switch (index) {
+      case PeriodsEnum.dom:
+        this.initialTime = initialTime;
+        this.endTime = endTime;
+        break;
+      case PeriodsEnum.seg:
+        this.initialTime = initialTime;
+        this.endTime = endTime;
+        break;
+      case PeriodsEnum.ter:
+        this.initialTime = initialTime;
+        this.endTime = endTime;
+        break;
+      case PeriodsEnum.qua:
+        this.initialTime = initialTime;
+        this.endTime = endTime;
+        break;
+      case PeriodsEnum.qui:
+        this.initialTime = initialTime;
+        this.endTime = endTime;
+        break;
+      case PeriodsEnum.sex:
+        this.initialTime = initialTime;
+        this.endTime = endTime;
+        break;
+      case PeriodsEnum.sab:
+        this.initialTime = initialTime;
+        this.endTime = endTime;
+        break;
+      default:
+        this.initialTime = '';
+        this.endTime = '';
+        break;
+    }
+
+    this.focoInputInitialTime();
+  }
+
+  private focoInputInitialTime() {
+    this.renderer.selectRootElement('#initialTime').focus();
+  }
+
+  onChangeTime(event: any, type: string) {
+    const indexExternal = this.indexPeriod;
+    let initialTime = '';
+    let endTime = '';
+
+    if (type === 'initialTime') {
+      initialTime = event.target.value;
+    } else {
+      endTime = event.target.value;
+    }
+
+    this.periods = this.periods.map((item: Periods, index: number) =>
+      index === indexExternal
+        ? {
+            ...item,
+            initialTime: initialTime ? initialTime : item.initialTime,
+            endTime: endTime ? endTime : item.endTime,
+          }
+        : item
+    );
+  }
+
+  getDescription(value: number) {
+    return PeriodsEnum[value];
+  }
+
+  patchValues(data: Store[]): void {
+    const res = data.map((item, index1) =>
+      item.storeModalitys.map((res, index2) => {
+        return {
+          id: 1,
+          storeModality: {
+            storeId: data[index1].storeId,
+            modalityId: data[index1].storeModalitys[index1].modality.id,
+            storeCode: data[index1].storeModalitys[index1].storeCode,
+            cashierCode: data[index1].storeModalitys[index1].cashierCode,
+          },
+          openingHours: res.openingHours.map(
+            ({ dayWeek, initialTime, endTime }) => {
+              return {
+                dayWeek: dayWeek,
+                initialTime: initialTime,
+                endTime: endTime,
+              };
+            }
+          ),
+          salesChannel: res.salesChannel.map(({ salesChannelId, token }) => {
+            return {
+              salesChannelId: salesChannelId,
+              token: token,
+            };
+          }),
+        };
+      })
+    );
+
+    const stores = res.flatMap(item => item);
+
+
+    const periods = stores.map((item, i) => {
+      return {
+        dayWeek: item.openingHours[i].dayWeek,
+        initialTime: item.openingHours[i].initialTime,
+        endTime: item.openingHours[i].endTime,
+      };
+    });
+
+    this.form.patchValue({ stores });
+    this.periods = this.mountGetPeriods(periods);
+  }
+
+  private mountGetPeriods(periods: Periods[]): Periods[] {
+    return this.periods.map((item: Periods, index) => {
+      const dayOfWeek = periods.find(item => item.dayWeek === index);
+
+      if (dayOfWeek) {
+        return dayOfWeek;
+      } else {
+        return item;
+      }
+    });
   }
 
   getOpeningHoursFormArray(form: any): FormArray {
@@ -150,13 +346,16 @@ export class FormArrayTestComponent implements OnInit {
     return form.get('salesChannel') as FormArray;
   }
 
-  selectedChannels(event: any, index: number): void {
+  selectedChannels(event: any): void {
     const value = event.source.value;
     const isSelected = event.source.selected;
     const canal = this.idIfood ? 'iFood' : 'Rappi';
 
     // Abrir modal para incluir token
-    if ((isSelected && value === this.idIfood) || (isSelected && value === this.idRappi)) {
+    if (
+      (isSelected && value === this.idIfood) ||
+      (isSelected && value === this.idRappi)
+    ) {
       this.matDialog
         .open(ModalTokenComponent, {
           width: '400px',

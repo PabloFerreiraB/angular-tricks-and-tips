@@ -49,7 +49,8 @@
                       <mat-label>Canais de venda</mat-label>
                       <mat-select
                         class="form-control"
-                        formControlName="salesChannelId">
+                        formControlName="salesChannelId"
+                        multiple>
                         <mat-option
                           *ngFor="let s of listSalesChannel"
                           [value]="s.salesChannelId"
@@ -96,15 +97,16 @@
                     let key = index
                   ">
                   <ng-container [formGroupName]="key">
+                    <!-- Days -->
                     <div class="container-period">
                       <div
                         class="day-wrapper"
-                        *ngFor="let item of periods; let i = index">
+                        *ngFor="let item of periods; let indexDay = index">
                         <a>
                           <mat-icon
                             class="icon"
                             [ngClass]="{
-                              isSelected: isSelected === i,
+                              isSelected: isSelected === i + '' + indexDay,
                               styleIconOne:
                                 item.initialTime === '' && item.endTime === '',
                               styleIconTwo:
@@ -122,14 +124,17 @@
                         <a
                           class="button-period"
                           [ngClass]="{
-                            isSelected: isSelected === i,
+                            isSelected: isSelected === i + '' + indexDay,
                             styleOne:
                               item.initialTime === '' && item.endTime === '',
                             styleTwo:
                               item.initialTime !== '' && item.endTime !== '',
                             styleDisableDay: disableDay
                           }"
-                          (click)="onClickPeriods(item, i)">
+                          (click)="
+                            onClickPeriods(item, i + '' + indexDay, indexDay, i)
+                          "
+                          [id]="indexDay">
                           {{ getDescription(item.dayWeek) }}
                         </a>
                       </div>
@@ -139,7 +144,7 @@
                       <mat-form-field appearance="outline">
                         <mat-label>Hora início</mat-label>
                         <input
-                          id="initialTime"
+                          [id]="'initialTime' + i"
                           matInput
                           type="time"
                           [disabled]="!clickedDay"
@@ -150,7 +155,7 @@
                       <mat-form-field appearance="outline">
                         <mat-label>Hora fim</mat-label>
                         <input
-                          id="endTime"
+                          [id]="'endTime' + i"
                           matInput
                           type="time"
                           [disabled]="!clickedDay"

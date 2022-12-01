@@ -1,5 +1,11 @@
 import { ModalTokenComponent } from './../modal-token/modal-token.component';
-import { Component, OnInit, Renderer2 } from '@angular/core';
+import {
+  Component,
+  OnChanges,
+  OnInit,
+  Renderer2,
+  SimpleChanges,
+} from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -31,7 +37,7 @@ export enum PeriodsEnum {
   templateUrl: './form-array-test.component.html',
   styleUrls: ['./form-array-test.component.scss'],
 })
-export class FormArrayTestComponent implements OnInit {
+export class FormArrayTestComponent implements OnInit, OnChanges {
   form: FormGroup;
 
   panelOpenState = false;
@@ -77,8 +83,8 @@ export class FormArrayTestComponent implements OnInit {
     },
   ];
   periodsSelecteds: Periods[] = [];
-  isSelected!: number;
-  indexPeriod?: number;
+  isSelected!: number | string;
+  indexPeriod?: number | string;
   initialTime = '';
   endTime = '';
   disableDay = false;
@@ -93,7 +99,7 @@ export class FormArrayTestComponent implements OnInit {
   listSalesChannel: any[] = [
     {
       salesChannelId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      salesChannelName: 'canal 1',
+      salesChannelName: 'Rappi',
       modalityId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       modalityName: 'modalidade 1',
     },
@@ -182,6 +188,8 @@ export class FormArrayTestComponent implements OnInit {
     },
   ];
 
+  salesChannel: any[] = [];
+
   constructor(
     private formBuilder: FormBuilder,
     private matDialog: MatDialog,
@@ -206,14 +214,23 @@ export class FormArrayTestComponent implements OnInit {
     this.patchValues(this.dataStores);
   }
 
-  onClickPeriods(day: { initialTime: string; endTime: string }, index: number) {
+  ngOnChanges(changes: SimpleChanges) {
+    console.log(changes);
+  }
+
+  onClickPeriods(
+    day: { initialTime: string; endTime: string },
+    index: string,
+    lero: number,
+    lero2: number
+  ) {
     this.isSelected = index;
     this.indexPeriod = index;
 
     const initialTime = day.initialTime.substring(0, 8);
     const endTime = day.endTime.substring(0, 8);
 
-    switch (index) {
+    switch (lero) {
       case PeriodsEnum.dom:
         this.initialTime = initialTime;
         this.endTime = endTime;
@@ -248,11 +265,11 @@ export class FormArrayTestComponent implements OnInit {
         break;
     }
 
-    this.focoInputInitialTime();
+    this.focoInputInitialTime(lero2);
   }
 
-  private focoInputInitialTime() {
-    this.renderer.selectRootElement('#initialTime').focus();
+  private focoInputInitialTime(lero2: number) {
+    this.renderer.selectRootElement(`#initialTime${lero2}`).focus();
   }
 
   onChangeTime(event: any, type: string) {
@@ -313,7 +330,6 @@ export class FormArrayTestComponent implements OnInit {
 
     const stores = res.flatMap(item => item);
 
-
     const periods = stores.map((item, i) => {
       return {
         dayWeek: item.openingHours[i].dayWeek,
@@ -370,8 +386,38 @@ export class FormArrayTestComponent implements OnInit {
           } else {
             console.log('Sem Token:', value);
           }
+          this.parseSalesChannel(this.form, value); // remover daqui da condição
         });
     }
+  }
+
+  parseSalesChannel(lero: any, token: string) {
+    // esse zero abaixo é a posiçao do index do form. alterar depois que tiver o id la certinho,
+    // dai da pra fazer um findIndex pra pegar a posiçao de quem quer alterar ou algo do tipo
+    const listSalesChannel: [] =
+      lero.value.stores[0].salesChannel[0].salesChannelId;
+    console.log(listSalesChannel);
+
+    listSalesChannel.forEach(saleChannelId => {
+      const foundSalesChannel = !!this.salesChannel.find(
+        ({ salesChannelId: id }) => id == saleChannelId
+      );
+
+      console.log(foundSalesChannel, saleChannelId);
+
+      if (!foundSalesChannel) {
+        console.log('adicionado saleChannel');
+
+        this.salesChannel.push({
+          salesChannelId: saleChannelId,
+          token,
+        });
+      }
+
+      // Remover quando desmarcar um canal (find + pop)
+    });
+
+    console.log(this.salesChannel);
   }
 
   add() {
